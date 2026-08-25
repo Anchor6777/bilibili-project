@@ -20,7 +20,7 @@ export default defineConfig({
           minPixelValue: 1, // 小于或等于1px不转换为视口单位，默认1
           mediaQuery: false, // 允许在媒体查询中转换px
           replace: true, // 是否直接替换而不是添加后缀
-          exclude: /node_modules/, // 设置忽略文件，用正则表达式匹配路径
+          exclude: [/node_modules/,/GlobalHeader\.vue/,/NotificationPage\.vue/], // 设置忽略文件，用正则表达式匹配路径
         }),
       ],
     },

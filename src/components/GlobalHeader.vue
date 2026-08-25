@@ -98,7 +98,7 @@ const gotoUserSpace = () => {
 </script>
 
 <template>
-  <div id="nav-bar" ref="navBar">
+  <div class="global-header" ref="navBar">
     <div class="left-side">
       <a class="nav-title" href="" @click="onNavClick('/')">
         <svg
@@ -248,7 +248,7 @@ const gotoUserSpace = () => {
 
   margin-right: 24px;
 }
-.text {
+.nav-item-container > .text {
   font-size: 14px;
   color: #fff;
   line-height: 14px;
@@ -288,7 +288,7 @@ const gotoUserSpace = () => {
   justify-content: start;
   padding-left: 16px;
 }
-#nav-bar {
+.global-header {
   height: 64px;
   background-color: transparent;
   position: sticky;
@@ -322,16 +322,16 @@ const gotoUserSpace = () => {
   transition: all ease-in-out 0.5s;
 }
 
-#nav-bar.alter {
+.global-header.alter {
   background-color: #ffffff;
   box-shadow: 0 2px 4px #00000014;
 }
-#nav-bar.alter .nav-item,
-#nav-bar.alter .nav-title,
-#nav-bar.alter .right-entry-icon {
+.global-header.alter .nav-item,
+.global-header.alter .nav-title,
+.global-header.alter .right-entry-icon {
   color: #18191c;
 }
-#nav-bar.alter .text {
+.global-header.alter .text {
   color: #61666d;
 }
 
