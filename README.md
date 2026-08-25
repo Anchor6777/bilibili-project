@@ -1,5 +1,32 @@
-# Vue 3 + TypeScript + Vite
+# bilibili-project
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+仿写B站web网页端的个人前端项目
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+本仓库为前端部分，后端参见[bilibili-project-backend]([Anchor6777/bilibili-project: 仿写b站web端的个人前端项目](https://github.com/Anchor6777/bilibili-project))
+
+## 技术栈
+
+- 语言：TS + JS
+- 框架/脚手架：Vue3 + Vite
+- 路由：Vue-Router
+- 网络请求库：Axios
+- 组件库：Naive UI
+- 状态管理：Pinia
+- 图床：PicGo
+- 其他第三方库：DPlayer（视频播放器）、lodash.js（工具库，提供防抖、节流等工具函数）、dayjs（日期处理库）
+
+## 主要页面/功能介绍
+
+### 1.首页
+
+#### 1.1登录：
+
+采用双Token登录机制（token、refreshToken），避免基于session的登录方式的两个缺点：
+
+1. 服务端需要保存状态信息，不支持分布式系统，A服务器保存了session对象，但B服务器没有。
+2. 服务器重启后，登录信息全部失效，因为内存被清空
+
+演示：
+
+<video src="https://origin.picgo.net/2026/08/25/login209fadc6d6f02b00.mp4" controls="false" autoplay="true" loop="true" muted="true" playsinline="true" width="100%"></video>
+
