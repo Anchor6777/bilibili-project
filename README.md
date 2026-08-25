@@ -28,5 +28,5 @@
 
 演示：
 
-<video src="https://origin.picgo.net/2026/08/25/login209fadc6d6f02b00.mp4" controls="false" autoplay="true" loop="true" muted="true" playsinline="true" width="100%"></video>
+https://github.com/user-attachments/assets/292a7ca9-a52e-4e68-88d0-d9e5b9b7f250
 
