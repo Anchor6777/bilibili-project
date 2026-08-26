@@ -6,6 +6,7 @@ import { useNotification } from "naive-ui";
 import { userLogin } from "../api/user";
 import type { User } from "../model/TypeDefinition";
 import { useNavBarStore } from "../store/navBarStore";
+import dayjs from "dayjs";
 
 const props = defineProps(["isOnTop"]);
 const navBar = useTemplateRef<HTMLDivElement>("navBar");
@@ -61,8 +62,7 @@ const notification = useNotification();
 const handleSubmit = async () => {
   try {
     const res = await userLogin(username.value, password.value);
-    console.log(res.data.data);
-    if (res.data && !res.data.data) {
+    if (res.data.code !== 200) {
       notification["error"]({
         content: `登录失败`,
         meta: `${res.data.message}: ${res.data.description}`,
@@ -71,9 +71,18 @@ const handleSubmit = async () => {
       });
       return;
     }
-    let newUser: User = res.data.data;
+    let newUser: User = res.data.data.userInfo;
     // 更新用户信息
     userInfo.setLoginInfo(newUser);
+
+    // 保存token
+    let tokenInfo = {
+      token: res.data.data.token,
+      refreshToken: res.data.data.refreshToken,
+      expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    };
+    localStorage.setItem("tokenInfo",JSON.stringify(tokenInfo));
+  
     notification["success"]({
       content: `登录成功`,
       meta: "登陆成功",
@@ -124,10 +133,14 @@ const gotoUserSpace = () => {
     </div>
     <div class="right-side">
       <img
+        v-if="userInfo.isLogin()"
         class="avatar"
         @click="showModal = true"
         :src="userInfo.loginInfo.avatar"
       />
+      <div v-else class="avatar empty-avatar" @click="showModal = true"">
+        <span>登录</span>
+      </div>
       <div class="nav-item-container" @click="onNavClick('/notification')">
         <svg
           width="20"
@@ -240,6 +253,16 @@ const gotoUserSpace = () => {
   </n-modal>
 </template>
 <style scoped>
+.empty-avatar > span{
+  font-size: 14px;
+  color: #e8e6e3;
+}
+.empty-avatar{
+  background-color: #00aeec;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .nav-item-container {
   display: flex;
   flex-direction: column;
@@ -266,8 +289,8 @@ const gotoUserSpace = () => {
 }
 .avatar {
   border-radius: 9999px;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   cursor: pointer;
   margin-right: 14px;
 }

@@ -11,6 +11,16 @@ export const userLogin = async (un: any, pw: any) => {
   });
 };
 
+export const refresh = async (refreshToken: string) => {
+  return myAxios.request({
+    url: "/user/refresh",
+    method: "GET",
+    params: {
+      refreshToken,
+    },
+  });
+};
+
 export const getCurrentUser = async () => {
   return myAxios.request({
     url: "/user/getCurrentUser",

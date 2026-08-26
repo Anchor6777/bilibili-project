@@ -6,6 +6,16 @@ import type { NamedVideo } from "../model/TypeDefinition";
 import { useRouter } from "vue-router";
 import { formatPlayCount, formatPlayTime } from "../constant";
 import dayjs from "dayjs";
+import { useLoginStore } from "../store/userLoginStore";
+
+const userLoginStore = useLoginStore();
+// 检查refreshToken是否过期，过期则清空用户登录信息
+if(localStorage.getItem("tokenInfo")){
+  let expires = JSON.parse(localStorage.getItem("tokenInfo")!).expires;
+  if(Date.now()>expires){
+    userLoginStore.resetLoginInfo();
+  }
+}
 
 // 切换header样式
 const navBarStore = useNavBarStore();
@@ -37,85 +47,6 @@ const tagNames = [
   "时尚美妆",
   "动物",
   "音乐",
-];
-
-// banner数据源
-interface BannerVideo {
-  cover_url: string;
-  play_count: Number;
-  play_time: string;
-  title: string;
-  uid: string;
-  username: string;
-  createTime: string;
-}
-const introVedios: BannerVideo[] = [
-  {
-    cover_url:
-      "https://i0.hdslb.com/bfs/archive/b60790dbf4d4d87fccbc286c6c2972981a2c06a2.jpg@672w_378h_1c_!web-home-common-cover",
-    play_count: 123,
-    play_time: "22:33",
-    title:
-      "【Outdoor Boys】独自不带帐篷在风雪中露营：单人搭建庇护所、篝火烤煎饼、美食、石头加热床",
-    uid: "1",
-    username: "OutdoorPlan户外计划",
-    createTime: "06-20",
-  },
-  {
-    cover_url:
-      "https://i0.hdslb.com/bfs/archive/b60790dbf4d4d87fccbc286c6c2972981a2c06a2.jpg@672w_378h_1c_!web-home-common-cover",
-    play_count: 123,
-    play_time: "22:33",
-    title:
-      "【Outdoor Boys】独自不带帐篷在风雪中露营：单人搭建庇护所、篝火烤煎饼、美食、石头加热床",
-    uid: "1",
-    username: "OutdoorPlan户外计划",
-    createTime: "06-20",
-  },
-  {
-    cover_url:
-      "https://i0.hdslb.com/bfs/archive/b60790dbf4d4d87fccbc286c6c2972981a2c06a2.jpg@672w_378h_1c_!web-home-common-cover",
-    play_count: 123,
-    play_time: "22:33",
-    title:
-      "【Outdoor Boys】独自不带帐篷在风雪中露营：单人搭建庇护所、篝火烤煎饼、美食、石头加热床",
-    uid: "1",
-    username: "OutdoorPlan户外计划",
-    createTime: "06-20",
-  },
-  {
-    cover_url:
-      "https://i0.hdslb.com/bfs/archive/b60790dbf4d4d87fccbc286c6c2972981a2c06a2.jpg@672w_378h_1c_!web-home-common-cover",
-    play_count: 123,
-    play_time: "22:33",
-    title:
-      "【Outdoor Boys】独自不带帐篷在风雪中露营：单人搭建庇护所、篝火烤煎饼、美食、石头加热床",
-    uid: "1",
-    username: "OutdoorPlan户外计划",
-    createTime: "06-20",
-  },
-  {
-    cover_url:
-      "https://i0.hdslb.com/bfs/archive/b60790dbf4d4d87fccbc286c6c2972981a2c06a2.jpg@672w_378h_1c_!web-home-common-cover",
-    play_count: 123,
-    play_time: "22:33",
-    title:
-      "【Outdoor Boys】独自不带帐篷在风雪中露营：单人搭建庇护所、篝火烤煎饼、美食、石头加热床",
-    uid: "1",
-    username: "OutdoorPlan户外计划",
-    createTime: "06-20",
-  },
-  {
-    cover_url:
-      "https://i0.hdslb.com/bfs/archive/b60790dbf4d4d87fccbc286c6c2972981a2c06a2.jpg@672w_378h_1c_!web-home-common-cover",
-    play_count: 123,
-    play_time: "22:33",
-    title:
-      "【Outdoor Boys】独自不带帐篷在风雪中露营：单人搭建庇护所、篝火烤煎饼、美食、石头加热床",
-    uid: "1",
-    username: "OutdoorPlan户外计划",
-    createTime: "06-20",
-  },
 ];
 
 const loading = ref(false);
