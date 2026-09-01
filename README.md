@@ -2,7 +2,7 @@
 
 仿写B站web网页端的个人前端项目
 
-本仓库为前端部分，后端参见[bilibili-project-backend]([Anchor6777/bilibili-project: 仿写b站web端的个人前端项目](https://github.com/Anchor6777/bilibili-project))
+本仓库为前端部分，后端部分参见[bilibili-project-backend](https://github.com/Anchor6777/bilibili-project-backend)
 
 ## 技术栈
 
