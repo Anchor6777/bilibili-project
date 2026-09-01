@@ -10,9 +10,9 @@ import { useLoginStore } from "../store/userLoginStore";
 
 const userLoginStore = useLoginStore();
 // 检查refreshToken是否过期，过期则清空用户登录信息
-if(localStorage.getItem("tokenInfo")){
+if (localStorage.getItem("tokenInfo")) {
   let expires = JSON.parse(localStorage.getItem("tokenInfo")!).expires;
-  if(Date.now()>expires){
+  if (Date.now() > expires) {
     userLoginStore.resetLoginInfo();
   }
 }
@@ -84,8 +84,8 @@ const onMouseEnter = (e: MouseEvent) => {
 };
 const onMouseMove = (e: MouseEvent) => {
   moveX = e.clientX - initX;
-  imgList[23].style.transform = `rotate(${moveX * 0.00007}deg) scale(${1+moveX*0.00003})`;
-  imgList[26].style.transform = `rotate(${-moveX * 0.001}deg) scale(${1+moveX*0.00005})`;
+  imgList[23].style.transform = `rotate(${moveX * 0.00007}deg) scale(${1 + moveX * 0.00003})`;
+  imgList[26].style.transform = `rotate(${-moveX * 0.001}deg) scale(${1 + moveX * 0.00005})`;
   imgList[28].style.transform = `translate(${-moveX * 0.05}px,0) rotate(${moveX * 0.008}deg)`;
   imgList[29].style.transform = `translate(${moveX * 0.12}px,0) rotate(${-moveX * 0.006}deg)`;
 
@@ -112,6 +112,16 @@ const onVideoClick = (videoID: number) => {
     name: "video",
     params: {
       videoID,
+    },
+  });
+  window.open(route.href, "_blank");
+};
+
+const onAuthorInfoClick = (userID: number) => {
+  const route = router.resolve({
+    name: "userSpace",
+    params: {
+      userID,
     },
   });
   window.open(route.href, "_blank");
@@ -236,7 +246,7 @@ const onVideoClick = (videoID: number) => {
       <img
         src="https://origin.picgo.net/2026/07/05/26fec1792c19782b69.webp"
         class="header-img"
-        style="transform-origin: 1200px 160px;"
+        style="transform-origin: 1200px 160px"
       />
       <img
         src="https://origin.picgo.net/2026/07/05/27d7ac5cf5494df243.webp"
@@ -778,7 +788,7 @@ const onVideoClick = (videoID: number) => {
                 <h3 class="intro-video-title">
                   {{ item.video.title }}
                 </h3>
-                <h3 class="intro-video-author">
+                <h3 class="intro-video-author" @click="onAuthorInfoClick(item.video.uid)">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -798,9 +808,7 @@ const onVideoClick = (videoID: number) => {
                       fill="currentColor"
                     ></path>
                   </svg>
-                  {{
-                    `${item.username} · ${dayjs(item.video.createTime).format("MM-DD")}`
-                  }}
+                  {{ `${item.username} · ${dayjs(item.video.createTime).format("MM-DD")}` }}
                 </h3>
               </div>
             </n-gi>
@@ -857,7 +865,7 @@ const onVideoClick = (videoID: number) => {
                 <h3 class="intro-video-title">
                   {{ item.video.title }}
                 </h3>
-                <h3 class="intro-video-author">
+                <h3 class="intro-video-author" @click="onAuthorInfoClick(item.video.uid)">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -1048,11 +1056,15 @@ const onVideoClick = (videoID: number) => {
 .recommend-video-list {
   margin-top: 64px;
 }
+.intro-video-author:hover{
+  color: #00aeec;
+}
 .intro-video-author {
   font-size: 13px;
   font-weight: 500;
   color: #a9a195;
   margin: 0;
+  cursor: pointer;
 }
 .intro-video-title {
   font-size: 15px;
