@@ -109,3 +109,12 @@ https://github.com/user-attachments/assets/59201dfd-bf4e-46f1-b0ca-7814a68c2b8f
 - **心跳保活机制**：主流服务器例如tomcat在管理ws连接时，如果一段时间内没有消息往返，就会释放连接导致连接断开。通过定时器定期发送心跳消息保活
 - **断线重连机制**：监听到ws的close事件后，关闭旧连接，不断尝试创建新连接。采取指数退避策略，重连间隔呈指数级增长，同时设置最大重连次数
 
+---
+
+### 4. 屏幕适配
+
+基于vw/vh视口单位实现屏幕适配。通过 postcss-px-to-viewport 插件，将css样式表中的px单位转换为视口单 位实现屏幕适配。
+
+演示：
+
+https://github.com/user-attachments/assets/d18149b1-2590-4569-aa8d-f4aebd1e3aaf
