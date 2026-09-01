@@ -4,7 +4,7 @@
 
 本仓库为前端部分，后端部分参见[bilibili-project-backend](https://github.com/Anchor6777/bilibili-project-backend)
 
-目前项目跑在本地，没有部署到服务器，readme文件中的图片/演示视频的图床是Github Issue，加载需要一点时间。
+目前项目跑在本地，没有部署到服务器，README文件中的图片/演示视频的图床是Github Issue，加载需要一点时间，还请耐心等待: )。
 
 ## 技术栈
 
