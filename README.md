@@ -1,8 +1,8 @@
 # bilibili-project
 
-仿写B站web网页端的个人前端项目
+简介：仿写B站网页端的个人前端项目
 
-本仓库为前端部分，后端部分参见[bilibili-project-backend](https://github.com/Anchor6777/bilibili-project-backend)
+本仓库为前端部分，后端部分参见[GitHub - Anchor6777/bilibili-project-backend: 仿写b站web端—后端部分 · GitHub](https://github.com/Anchor6777/bilibili-project-backend)
 
 目前项目跑在本地，没有部署到服务器，README文件中的图片/演示视频的图床是Github Issue，加载需要一点时间，还请耐心等待: )。
 
