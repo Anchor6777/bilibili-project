@@ -83,7 +83,9 @@ const onSenderItemClick = (index: number) => {
 
 // 打开websocket
 let ws: WebSocket;
-let wsURL = "ws://localhost:8080/new_chat";
+let token = JSON.parse(localStorage.getItem("tokenInfo")!).token;
+let wsURL = `ws://localhost:8080/new_chat?token=${token}`;
+
 let socketClient: WebSocketClient;
 
 const startNewWebSocket = () => {
@@ -156,6 +158,7 @@ const onSubmit = () => {
 // 清理副作用，包括定时器、ws连接等等
 onUnmounted(() => {
   socketClient.close();
+  console.log("===");
 });
 </script>
 

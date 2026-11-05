@@ -51,6 +51,7 @@ export class WebSocketClient {
     // 已经启动，直接返回
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       console.log("已存在open状态的ws实例, 请勿重复启动");
+      return;
     }
 
     console.log("ws启动中...");
@@ -155,7 +156,7 @@ export class WebSocketClient {
     if (this.reconnectTimes < this.maxReconnectTimes) {
       this.reconnectTimes++;
       // 重连间隔指数级增长，但是不超过最大间隔，防止用户等待时间过长
-      let interval = Math.max(
+      let interval = Math.min(
         this.reconnectInterval * Math.pow(2, this.reconnectTimes - 1),
         this.maxReconnectInterval,
       );

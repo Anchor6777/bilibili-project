@@ -234,7 +234,7 @@ const onMessageClick = () => {
     });
     return;
   }
-  if (userLoginStore.loginInfo.id === videoInfo.value!.id) {
+  if (userLoginStore.loginInfo.id === authorInfo.value!.id) {
     notification["error"]({
       content: "错误",
       meta: "不能给自己发消息",
