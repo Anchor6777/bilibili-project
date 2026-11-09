@@ -82,14 +82,11 @@ const onSenderItemClick = (index: number) => {
 };
 
 // 打开websocket
-let ws: WebSocket;
-let token = JSON.parse(localStorage.getItem("tokenInfo")!).token;
-let wsURL = `ws://localhost:8080/new_chat?token=${token}`;
-
+let wsBaseUrl = `ws://localhost:8080/new_chat`;
 let socketClient: WebSocketClient;
 
 const startNewWebSocket = () => {
-  socketClient = new WebSocketClient(wsURL);
+  socketClient = new WebSocketClient(wsBaseUrl);
   socketClient.onmessage(async (ev: any) => {
     const typedMsg = JSON.parse(ev.data);
 

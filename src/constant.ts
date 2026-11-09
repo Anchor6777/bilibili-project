@@ -22,3 +22,23 @@ export const formatPlayTime = (playTime: number | undefined) => {
     return `${pad(m)}:${pad(s)}`;
   }
 };
+
+// 从本地存储获取token
+export const getToken = () => {
+  let tokenStr = localStorage.getItem("tokenInfo");
+  if(!tokenStr){
+    return null;
+  }else {
+    return JSON.parse(tokenStr).token;
+  }
+}
+
+// 从本地存储获取refreshToken
+export const getRefreshToken = () => {
+  let tokenStr = localStorage.getItem("tokenInfo");
+  if(!tokenStr){
+    return null;
+  }else {
+    return JSON.parse(tokenStr).refreshToken;
+  }
+}

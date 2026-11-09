@@ -1,3 +1,5 @@
+import { getToken } from "./constant";
+
 /**
  * WebSocket封装类，实现了如下功能：
  *   - 断线重连。采用指数退避重连策略，每次重连的间隔呈指数级增长（5秒、10秒、20秒...）
@@ -54,9 +56,15 @@ export class WebSocketClient {
       return;
     }
 
+    if(!getToken()){
+      console.log("token不存在, 请先登录");
+      return;
+    }
+
     console.log("ws启动中...");
 
-    this.socket = new WebSocket(this.url);
+    let urlWithToken = `${this.url}?token=${getToken()}`
+    this.socket = new WebSocket(urlWithToken);
     this.socket.addEventListener("open", () => {
       this.dispatchEvent("open");
       this.startHeartBeat();

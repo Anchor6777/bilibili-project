@@ -1,3 +1,4 @@
+import { getRefreshToken, getToken } from "../constant";
 import myAxios from "../request";
 
 export const userLogin = async (un: any, pw: any) => {
@@ -17,6 +18,23 @@ export const refresh = async (refreshToken: string) => {
     method: "GET",
     params: {
       refreshToken,
+    },
+  });
+};
+
+/**
+ * 验证token是否有效
+ * @param token token或rToken
+ * @param isRefresh 如果是rToken，为true
+ * @returns 
+ */
+export const verifyToken = async (token: string,isRefresh:boolean) => {
+  return myAxios.request({
+    url: "/user/verify",
+    method: "GET",
+    params: {
+      token: isRefresh? getRefreshToken() : getToken(),
+      isRefresh,
     },
   });
 };

@@ -138,7 +138,7 @@ const gotoUserSpace = () => {
         @click="showModal = true"
         :src="userInfo.loginInfo.avatar"
       />
-      <div v-else class="avatar empty-avatar" @click="showModal = true"">
+      <div v-else class="avatar empty-avatar" @click="showModal = true">
         <span>登录</span>
       </div>
       <div class="nav-item-container" @click="onNavClick('/notification')">

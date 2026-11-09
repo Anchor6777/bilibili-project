@@ -20,7 +20,7 @@ export const useLoginStore = defineStore("loginInfo", {
 
     // 判断用户是否登录
     function isLogin() {
-      return loginInfo.value.id !== 0;
+      return loginInfo.value.id > 0;
     }
 
     // 重置用户信息
@@ -33,6 +33,7 @@ export const useLoginStore = defineStore("loginInfo", {
         avatar: "",
         email: "",
       };
+      localStorage.removeItem("tokenInfo");
     }
 
     return { loginInfo, setLoginInfo, resetLoginInfo, isLogin };

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { refresh } from "./api/user";
 import { useLoginStore } from "./store/userLoginStore";
+import { getRefreshToken, getToken } from "./constant";
 
 const myAxios = axios.create({
   baseURL: "http://localhost:8080/",
@@ -21,16 +22,12 @@ myAxios.interceptors.request.use((config) => {
 
 myAxios.interceptors.response.use(async (response) => {
   let { data, config } = response;
-  // 如果token过期，则使用refreshToken刷新
-  console.log(data.code);
   if (
     localStorage.getItem("tokenInfo") &&
     data.code === 40100 &&
     !config.url?.includes("/user/refresh")
   ) {
-    let refreshToken = JSON.parse(
-      localStorage.getItem("tokenInfo")!,
-    ).refreshToken;
+    let refreshToken = getRefreshToken();
     let res = await refresh(refreshToken);
     if (res.data.code === 200 && res.data.data) {
       // 保存token
@@ -40,12 +37,20 @@ myAxios.interceptors.response.use(async (response) => {
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
       };
       localStorage.setItem("tokenInfo", JSON.stringify(tokenInfo));
-      // 重新发起请求
+      // 当调用verify验证token/rToken时，token过期->刷新token->重新发起请求
+      // 在重新发起请求时，要更改参数为更新后的token/rToken，否则会死循环，语义也不对。
+      if(config.url?.startsWith("/user/verify")){
+        if(config.params.isRefresh === true){
+          config.params.token = getRefreshToken();
+        }else{
+          config.params.token = getToken();
+        }
+      }
       return myAxios(config);
     } else {
       // refreshToken失效，置空用户登录信息，提示用户重新登陆
-      let userLoginStore = useLoginStore();
-      // userLoginStore.resetLoginInfo();
+      let userInfo = useLoginStore();
+      userInfo.resetLoginInfo();
     }
   }
   return response;
