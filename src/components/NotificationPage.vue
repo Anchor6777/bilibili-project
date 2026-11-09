@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, ref, watch, type Ref } from "vue";
+import {
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+  type Ref,
+} from "vue";
 import { getOneChatRecord, getRecentChatRecord } from "../api/notification";
 import type { ChatRecord } from "../model/TypeDefinition";
 import { useLoginStore } from "../store/userLoginStore";
@@ -17,8 +25,8 @@ const router = useRouter();
 const chat_records: Ref<ChatRecord[]> = ref([]);
 // id -> ChatRecord 的Map。用于接受新消息时，根据id获取ChatRecord实例
 const chat_records_map: Map<number, ChatRecord> = new Map();
-// 选中的会话条目（chat_records数组的索引）
-const selectIndex = ref(-1);
+// 选中的会话条目
+let currentRecord: Ref<ChatRecord | null> = ref(null);
 const chatRecordPromise = getRecentChatRecord(userInfo.loginInfo.id);
 // 消息列表元素
 const msgListRef = ref<HTMLElement>();
@@ -29,23 +37,18 @@ onMounted(() => {
   navBarStore.setStyle(1);
 });
 
-// 通过路由参数params保存选中的数组索引
-watch(
-  () => route.params.selectIndex,
-  (idxStr) => {
-    chatRecordPromise.then(() => {
-      selectIndex.value = Number(idxStr);
-      console.log(selectIndex.value);
-    });
-  },
-  { immediate: true },
-);
-
 chatRecordPromise.then((res) => {
   // 将一个数组添加到另一个数组时，要用"..."（展开运算符）
   chat_records.value.push(...res.data.data);
   chat_records.value.forEach((record) => {
     chat_records_map.set(record.user.id, record);
+  });
+
+  currentRecord = computed<ChatRecord | null>(() => {
+    const raw = route.params.selectIndex;
+    const idx = raw === undefined ? -1 : Number(raw);
+    if (!Number.isInteger(idx) || idx < 0) return null; // 0 是合法的，别用 if(idx)
+    return chat_records.value[idx] ?? null; // 越界自动变 null
   });
 
   // 从其他页面点击"发消息"跳转过来
@@ -67,8 +70,7 @@ chatRecordPromise.then((res) => {
     }
 
     // 选中该ChatRecord
-    selectIndex.value = 0;
-    console.log(selectIndex.value);
+    currentRecord.value = chat_records.value[0];
   }
 });
 
@@ -126,7 +128,10 @@ const startNewWebSocket = () => {
   });
   socketClient.startWS();
 };
-startNewWebSocket();
+
+if (userInfo.isLogin()) {
+  startNewWebSocket();
+}
 
 const inputContent = ref("");
 const onSubmit = () => {
@@ -144,7 +149,7 @@ const onSubmit = () => {
       type: "chat_msg",
       data: {
         sender_id: userInfo.loginInfo.id,
-        receiver_id: chat_records.value[selectIndex.value].user.id,
+        receiver_id: currentRecord.value!.user.id,
         content: inputContent.value,
       },
     }),
@@ -185,7 +190,7 @@ onUnmounted(() => {
             <div
               v-for="(item, index) in chat_records"
               :class="{
-                select: selectIndex === index,
+                select: item === currentRecord,
                 'sender-list-item': true,
               }"
               :key="item.user.id"
@@ -201,14 +206,14 @@ onUnmounted(() => {
             </div>
           </div>
         </div>
-        <div v-if="selectIndex >= 0" class="chat-box">
+        <div v-if="currentRecord" class="chat-box">
           <div class="msg-list-container" ref="msgListRef">
             <span class="msg-list-username">{{
-              chat_records[selectIndex].user.username
+              currentRecord.user.username
             }}</span>
             <div class="msg-list">
               <div
-                v-for="(item, index) in chat_records[selectIndex].msgList"
+                v-for="(item, index) in currentRecord.msgList"
                 :class="{
                   reverse: item.sender_id === userInfo.loginInfo.id,
                   'msg-card': true,
@@ -216,7 +221,7 @@ onUnmounted(() => {
               >
                 <template v-if="item.sender_id !== userInfo.loginInfo.id">
                   <img
-                    :src="chat_records[selectIndex].user.avatar"
+                    :src="currentRecord.user.avatar"
                     class="msg-card-avatar"
                   />
                   <span class="msg-content">{{ item.content }}</span>
