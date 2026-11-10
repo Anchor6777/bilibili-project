@@ -44,18 +44,13 @@ chatRecordPromise.then((res) => {
     chat_records_map.set(record.user.id, record);
   });
 
-  currentRecord = computed<ChatRecord | null>(() => {
-    const raw = route.params.selectIndex;
-    const idx = raw === undefined ? -1 : Number(raw);
-    if (!Number.isInteger(idx) || idx < 0) return null; // 0 是合法的，别用 if(idx)
-    return chat_records.value[idx] ?? null; // 越界自动变 null
-  });
-
   // 从其他页面点击"发消息"跳转过来
   if (route.params.another_id) {
     let anotherId = Number(route.params.another_id);
-    // 如果已经有和another_id对应用户的ChatRecord，则移动到数组头部
+    if (!Number.isInteger(anotherId) || anotherId < 0) return; // 边界判断
+
     if (chat_records_map.get(anotherId)) {
+      // 如果已经有和another_id对应用户的会话，则移动到数组头部
       const index = chat_records.value.indexOf(
         chat_records_map.get(anotherId)!,
       );
@@ -68,10 +63,24 @@ chatRecordPromise.then((res) => {
         chat_records_map.set(record.user.id, record);
       });
     }
-
-    // 选中该ChatRecord
-    currentRecord.value = chat_records.value[0];
   }
+
+  // 设置当前会话，selectIndex 优先于 anotherId
+  currentRecord = computed<ChatRecord | null>(() => {
+    const raw = route.params.selectIndex;
+    const idx = raw === undefined ? -1 : Number(raw);
+
+    const raw2 = route.params.another_id;
+    const anotherId = raw2 === undefined ? -1 : Number(raw2);
+    if (Number.isInteger(idx) && idx >= 0) {
+      // 如果url参数route.params.selectIndex存在且合法
+      return chat_records.value[idx] ?? null;
+    } else if (Number.isInteger(anotherId) && anotherId >= 0) {
+      return chat_records_map.get(anotherId) ?? null;
+    } else {
+      return null;
+    }
+  });
 });
 
 const onSenderItemClick = (index: number) => {
@@ -190,7 +199,7 @@ onUnmounted(() => {
             <div
               v-for="(item, index) in chat_records"
               :class="{
-                select: item === currentRecord,
+                select: currentRecord && item.user.id === currentRecord.user.id,
                 'sender-list-item': true,
               }"
               :key="item.user.id"
