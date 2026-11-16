@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, reactive, ref, type Reactive, type Ref } from "vue";
+import {
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+  type Reactive,
+  type Ref,
+} from "vue";
 import { getOneChatRecord, getRecentChatRecord } from "../api/notification";
 import type { ChatRecord } from "../model/TypeDefinition";
 import { useLoginStore } from "../store/userLoginStore";
@@ -28,7 +37,6 @@ const currentRecord = computed<ChatRecord | null>(() => {
     // 如果url参数route.params.selectIndex存在且合法
     return chat_records.value[select] ?? null;
   } else if (Number.isInteger(another) && another >= 0) {
-    console.log(chat_records_map.get(another));
     return chat_records_map.get(another) ?? null;
   } else {
     return null;
@@ -98,30 +106,46 @@ const startNewWebSocket = () => {
     switch (typedMsg.type) {
       case "chat_msg":
         // 将新消息添加到消息列表
-        const record =
-          chat_records_map.get(typedMsg.data.sender_id) ||
-          chat_records_map.get(typedMsg.data.receiver_id);
-        // // 消息列表中不存在该用户，创建新的条目插入到数组头部
-        // if (!record) {
-        //   const res = await getOneChatRecord(typedMsg.data.sender_id);
-        //   chat_records.value.unshift(res.data.data);
-        //   return;
-        // }
+        let record: ChatRecord | undefined = chat_records_map.get(
+          typedMsg.data.receiver_id,
+        );
+        // 消息列表中不存在该用户，创建新的条目插入到数组头部
+        if (!record) {
+          const res = await getOneChatRecord(
+            userInfo.loginInfo.id,
+            typedMsg.data.sender_id,
+          );
+          // 请求失败，通知用户
+          if (res.data.code !== 200 || !res.data.data) {
+            notification["error"]({
+              content: "错误",
+              meta: res.data.message ?? "请求失败，请检查网络",
+              duration: 2500,
+              keepAliveOnHover: true,
+            });
+            return;
+          }
+          record = res.data.data;
+          chat_records.value.unshift(record!);
+          chat_records_map.set(record!.user.id, record!);
+          return;
+        }
         // 存在该用户，直接插入到消息列表
-        record?.msgList.push({
+        record!.msgList.push({
           id: -1,
           sender_id: typedMsg.data.sender_id,
           receiver_id: typedMsg.data.receiver_id,
           content: typedMsg.data.content,
         });
-        // 滑动消息列表到最底部
-        let msgList = msgListRef.value;
-        // 等待DOM更新完毕
-        await nextTick();
-        msgList?.scrollTo({
-          top: msgList.scrollHeight,
-          behavior: "smooth",
-        });
+
+        // // 滑动消息列表到最底部
+        // let msgList = msgListRef.value;
+        // // 等待DOM更新完毕
+        // await nextTick();
+        // msgList?.scrollTo({
+        //   top: msgList.scrollHeight,
+        //   behavior: "smooth",
+        // });
         break;
       default:
         break;
@@ -161,7 +185,6 @@ const onSubmit = () => {
 // 清理副作用，包括定时器、ws连接等等
 onUnmounted(() => {
   socketClient.close();
-  console.log("===");
 });
 </script>
 
