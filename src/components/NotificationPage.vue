@@ -1,13 +1,5 @@
 <script setup lang="ts">
-import {
-  computed,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-  type Ref,
-} from "vue";
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, type Reactive, type Ref } from "vue";
 import { getOneChatRecord, getRecentChatRecord } from "../api/notification";
 import type { ChatRecord } from "../model/TypeDefinition";
 import { useLoginStore } from "../store/userLoginStore";
@@ -24,9 +16,25 @@ const router = useRouter();
 // 聊天信息数据源
 const chat_records: Ref<ChatRecord[]> = ref([]);
 // id -> ChatRecord 的Map。用于接受新消息时，根据id获取ChatRecord实例
-const chat_records_map: Map<number, ChatRecord> = new Map();
-// 选中的会话条目
-let currentRecord: Ref<ChatRecord | null> = ref(null);
+const chat_records_map: Reactive<Map<Number, ChatRecord>> = reactive(new Map());
+// 设置选中的会话/当前会话，selectIndex 优先于 anotherId
+const currentRecord = computed<ChatRecord | null>(() => {
+  const raw = route.params.selectIndex;
+  const select = raw === undefined ? -1 : Number(raw);
+
+  const raw2 = route.params.another_id;
+  const another = raw2 === undefined ? -1 : Number(raw2);
+  if (Number.isInteger(select) && select >= 0) {
+    // 如果url参数route.params.selectIndex存在且合法
+    return chat_records.value[select] ?? null;
+  } else if (Number.isInteger(another) && another >= 0) {
+    console.log(chat_records_map.get(another));
+    return chat_records_map.get(another) ?? null;
+  } else {
+    return null;
+  }
+});
+
 const chatRecordPromise = getRecentChatRecord(userInfo.loginInfo.id);
 // 消息列表元素
 const msgListRef = ref<HTMLElement>();
@@ -64,25 +72,9 @@ chatRecordPromise.then((res) => {
       });
     }
   }
-
-  // 设置当前会话，selectIndex 优先于 anotherId
-  currentRecord = computed<ChatRecord | null>(() => {
-    const raw = route.params.selectIndex;
-    const idx = raw === undefined ? -1 : Number(raw);
-
-    const raw2 = route.params.another_id;
-    const anotherId = raw2 === undefined ? -1 : Number(raw2);
-    if (Number.isInteger(idx) && idx >= 0) {
-      // 如果url参数route.params.selectIndex存在且合法
-      return chat_records.value[idx] ?? null;
-    } else if (Number.isInteger(anotherId) && anotherId >= 0) {
-      return chat_records_map.get(anotherId) ?? null;
-    } else {
-      return null;
-    }
-  });
 });
 
+// 通过路由参数保存选中会话的id
 const onSenderItemClick = (index: number) => {
   router.replace({
     name: "notification",
@@ -227,6 +219,7 @@ onUnmounted(() => {
                   reverse: item.sender_id === userInfo.loginInfo.id,
                   'msg-card': true,
                 }"
+                :key="item.id"
               >
                 <template v-if="item.sender_id !== userInfo.loginInfo.id">
                   <img
