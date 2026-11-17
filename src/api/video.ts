@@ -5,12 +5,13 @@ import type {
 } from "../model/TypeDefinition";
 import myAxios from "../request";
 
-export const getVideoList = async (count: number) => {
+export const getVideoList = async (pageNum:number, pageSize:number) => {
   return myAxios.request({
     url: "/video/video_list",
     method: "GET",
     params: {
-      count,
+      pageNum,
+      pageSize
     },
   });
 };

@@ -55,6 +55,14 @@ export interface VideoCommentResponse {
   childComments: VideoComment[];
 }
 
+export interface PageRespnse<T> {
+  records: T[];   // 当前页数据
+  total: number;  // 总条数
+  pageNum: number;  // 页数
+  pageSize: number; // 当前页数量
+  hasMore: boolean; // 是否还有下一页
+}
+
 export interface SendDanmuRequest {
   id: number;
   author: string;

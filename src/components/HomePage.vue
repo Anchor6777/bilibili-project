@@ -2,13 +2,16 @@
 import { computed, onMounted, ref, type Ref } from "vue";
 import { useNavBarStore } from "../store/navBarStore";
 import { getVideoList } from "../api/video";
-import type { NamedVideo } from "../model/TypeDefinition";
+import type { NamedVideo, PageRespnse } from "../model/TypeDefinition";
 import { useRouter } from "vue-router";
 import { formatPlayCount, formatPlayTime } from "../constant";
 import dayjs from "dayjs";
 import { useLoginStore } from "../store/userLoginStore";
+import { useNotification } from "naive-ui";
 
+const notification = useNotification();
 const userLoginStore = useLoginStore();
+
 // 检查refreshToken是否过期，过期则清空用户登录信息
 if (localStorage.getItem("tokenInfo")) {
   let expires = JSON.parse(localStorage.getItem("tokenInfo")!).expires;
@@ -50,20 +53,33 @@ const tagNames = [
 ];
 
 const loading = ref(false);
-
+const videoPageData: Ref<PageRespnse<NamedVideo> | null> = ref(null);
 const recommend_videos: Ref<NamedVideo[]> = ref([]);
-getVideoList(15).then((res) => {
-  recommend_videos.value = res.data.data;
-});
-const noMore = computed(() => recommend_videos.value.length >= 40);
+const noMore = ref(false);
 
 async function handleLoad() {
   if (loading.value || noMore.value) return;
   loading.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  recommend_videos.value.push(...recommend_videos.value);
+  const res = await getVideoList(
+    videoPageData.value ? videoPageData.value.pageNum + 1 : 1,
+    10,
+  );
+  if (res.data.code === 200 && res.data.data) {
+    videoPageData.value = res.data.data;
+    recommend_videos.value.push(...videoPageData.value!.records);
+    noMore.value = !videoPageData.value!.hasMore;
+  } else {
+    notification["error"]({
+      content: `视频获取失败`,
+      meta: `${res.data.message}: ${res.data.description}`,
+      duration: 2500,
+      keepAliveOnHover: true,
+    });
+  }
   loading.value = false;
 }
+
+handleLoad();
 
 // 实现header的视差效果
 let initX = 0;
@@ -788,7 +804,10 @@ const onAuthorInfoClick = (userID: number) => {
                 <h3 class="intro-video-title">
                   {{ item.video.title }}
                 </h3>
-                <h3 class="intro-video-author" @click="onAuthorInfoClick(item.video.uid)">
+                <h3
+                  class="intro-video-author"
+                  @click="onAuthorInfoClick(item.video.uid)"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -808,7 +827,9 @@ const onAuthorInfoClick = (userID: number) => {
                       fill="currentColor"
                     ></path>
                   </svg>
-                  {{ `${item.username} · ${dayjs(item.video.createTime).format("MM-DD")}` }}
+                  {{
+                    `${item.username} · ${dayjs(item.video.createTime).format("MM-DD")}`
+                  }}
                 </h3>
               </div>
             </n-gi>
@@ -865,7 +886,10 @@ const onAuthorInfoClick = (userID: number) => {
                 <h3 class="intro-video-title">
                   {{ item.video.title }}
                 </h3>
-                <h3 class="intro-video-author" @click="onAuthorInfoClick(item.video.uid)">
+                <h3
+                  class="intro-video-author"
+                  @click="onAuthorInfoClick(item.video.uid)"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -1056,7 +1080,7 @@ const onAuthorInfoClick = (userID: number) => {
 .recommend-video-list {
   margin-top: 64px;
 }
-.intro-video-author:hover{
+.intro-video-author:hover {
   color: #00aeec;
 }
 .intro-video-author {
