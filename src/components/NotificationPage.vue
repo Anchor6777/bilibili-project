@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
   computed,
-  nextTick,
   onMounted,
   onUnmounted,
   reactive,
@@ -44,8 +43,6 @@ const currentRecord = computed<ChatRecord | null>(() => {
 });
 
 const chatRecordPromise = getRecentChatRecord(userInfo.loginInfo.id);
-// 消息列表元素
-const msgListRef = ref<HTMLElement>();
 
 // 改变导航栏样式
 const navBarStore = useNavBarStore();
@@ -93,7 +90,8 @@ const onSenderItemClick = (index: number) => {
 };
 
 // 打开websocket
-let wsBaseUrl = `ws://localhost:8080/new_chat`;
+const proto = location.protocol === "https:" ? "wss:" : "ws:";
+let wsBaseUrl = `${proto}//${location.host}/api/new_chat`;
 let socketClient: WebSocketClient;
 
 const startNewWebSocket = () => {
@@ -237,7 +235,7 @@ onUnmounted(() => {
             }}</span>
             <div class="msg-list">
               <div
-                v-for="(item, index) in currentRecord.msgList"
+                v-for="(item, _) in currentRecord.msgList"
                 :class="{
                   reverse: item.sender_id === userInfo.loginInfo.id,
                   'msg-card': true,

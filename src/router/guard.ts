@@ -1,9 +1,7 @@
 import type { Router } from "vue-router";
 import { verifyToken } from "../api/user";
 import { getToken } from "../constant";
-import { useNotification } from "naive-ui";
 export function setupAuthRouterGuard(router: Router) {
-  const notification = useNotification();
   router.beforeEach(async (to) => {
     if (!to.meta.requiresAuth) return true;
 

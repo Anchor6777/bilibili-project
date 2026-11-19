@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import GlobalHeader from "./GlobalHeader.vue";
 import { useLoginStore } from "../store/userLoginStore.ts";
 import {
   getFansCount,
@@ -225,7 +224,7 @@ const onVideoClick = (videoID: number) => {
         </div>
         <div class="video-list">
           <n-grid cols="4 xxl:5" responsive="screen" :x-gap="24" :y-gap="24">
-            <n-gi v-for="(item, index) in videoList" :key="item.id">
+            <n-gi v-for="(item, _) in videoList" :key="item.id">
               <div class="intro-video-item">
                 <div style="position: relative">
                   <img

@@ -4,7 +4,7 @@ import { useLoginStore } from "./store/userLoginStore";
 import { getRefreshToken, getToken } from "./constant";
 
 const myAxios = axios.create({
-  baseURL: "http://localhost:8080/",
+  baseURL: "/api",
   timeout: 10000,
   withCredentials: true,
 });

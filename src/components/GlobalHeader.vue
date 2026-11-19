@@ -6,7 +6,6 @@ import { useNotification } from "naive-ui";
 import { userLogin } from "../api/user";
 import type { User } from "../model/TypeDefinition";
 import { useNavBarStore } from "../store/navBarStore";
-import dayjs from "dayjs";
 
 const props = defineProps(["isOnTop"]);
 const navBar = useTemplateRef<HTMLDivElement>("navBar");

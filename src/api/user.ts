@@ -1,4 +1,3 @@
-import { getRefreshToken, getToken } from "../constant";
 import myAxios from "../request";
 
 export const userLogin = async (un: any, pw: any) => {
@@ -33,7 +32,7 @@ export const verifyToken = async (token: string,isRefresh:boolean) => {
     url: "/user/verify",
     method: "GET",
     params: {
-      token: isRefresh? getRefreshToken() : getToken(),
+      token,
       isRefresh,
     },
   });

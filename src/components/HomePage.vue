@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, type Ref } from "vue";
+import { onMounted, ref, type Ref } from "vue";
 import { useNavBarStore } from "../store/navBarStore";
 import { getVideoList } from "../api/video";
 import type { NamedVideo, PageRespnse } from "../model/TypeDefinition";
@@ -110,7 +110,7 @@ const onMouseMove = (e: MouseEvent) => {
 
   imgList[13].style.transform = `translate(${moveX * 0.01}px,0px)`;
 };
-const onMouseLeave = (e: MouseEvent) => {
+const onMouseLeave = () => {
   imgList.forEach((img) => {
     img.style.transition = "all ease-in-out 0.3s";
   });
@@ -758,7 +758,7 @@ const onAuthorInfoClick = (userID: number) => {
             :y-gap="24"
           >
             <n-gi
-              v-for="(item, index) in recommend_videos"
+              v-for="(item, _) in recommend_videos"
               :key="item.video.id"
             >
               <div class="intro-video-item">
@@ -840,7 +840,7 @@ const onAuthorInfoClick = (userID: number) => {
         <n-infinite-scroll :distance="0" @load="handleLoad">
           <n-grid cols="4 xxl:5" responsive="screen" :x-gap="24" :y-gap="24">
             <n-gi
-              v-for="(item, index) in recommend_videos"
+              v-for="(item, _) in recommend_videos"
               :key="item.video.id"
             >
               <div class="intro-video-item">

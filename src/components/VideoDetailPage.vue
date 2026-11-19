@@ -8,7 +8,6 @@ import {
   getVideoByID,
   getVideoList,
   sendComment,
-  sendDanmu,
 } from "../api/video";
 import type {
   NamedVideo,
@@ -46,7 +45,7 @@ if (!videoID) videoID = 1;
 onMounted(async () => {
   const res = await getVideoByID(videoID);
   videoInfo.value = res.data.data;
-  const dp = new DPlayer({
+  new DPlayer({
     container: document.querySelector(".video-box"),
     video: {
       url: videoInfo.value?.source_url,
@@ -329,8 +328,8 @@ getDanmu(videoID).then((res) => {
 });
 
 const recommend_videos: Ref<NamedVideo[]> = ref([]);
-getVideoList(15).then((res) => {
-  recommend_videos.value = res.data.data;
+getVideoList(2,15).then((res) => {
+  recommend_videos.value = res.data.data.records;
 });
 </script>
 
@@ -397,7 +396,7 @@ getVideoList(15).then((res) => {
       <div class="video-box"></div>
       <div class="video-desc">{{ videoInfo?.video_desc }}</div>
       <div class="video-tag-container">
-        <template v-for="(item, index) in tagList">
+        <template v-for="(item, _) in tagList">
           <div class="video-tag">
             {{ item }}
           </div>
@@ -460,7 +459,7 @@ getVideoList(15).then((res) => {
                 </template>
                 <template v-else>
                   <template
-                    v-for="(childItem, childIndex) in item.childComments"
+                    v-for="(childItem, _) in item.childComments"
                   >
                     <div class="child-comment-card">
                       <img :src="childItem.avatar" />
@@ -604,7 +603,7 @@ getVideoList(15).then((res) => {
       <div class="recommend-video-list">
         <div
           class="recommend-video-item"
-          v-for="(item, index) in recommend_videos"
+          v-for="(item, _) in recommend_videos"
           :key="item.video.id"
         >
           <img :src="item.video.cover_url" class="recommend-video-cover" />

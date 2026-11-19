@@ -6,7 +6,7 @@ import { useNavBarStore } from "./store/navBarStore.ts";
 
 const isOnTop = ref(true);
 const navBarStore = useNavBarStore();
-const onPageScroll = (e: Event) => {
+const onPageScroll = () => {
   if (!navBarStore.slideChange) {
     return;
   }
