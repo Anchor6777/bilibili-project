@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   computed,
+  nextTick,
   onMounted,
   onUnmounted,
   reactive,
@@ -49,6 +50,8 @@ const navBarStore = useNavBarStore();
 onMounted(() => {
   navBarStore.setStyle(1);
 });
+
+const msgListRef = ref<HTMLDivElement | null>(null);
 
 chatRecordPromise.then((res) => {
   // 将一个数组添加到另一个数组时，要用"..."（展开运算符）
@@ -103,8 +106,8 @@ const startNewWebSocket = () => {
     // 1."chat_msg"，普通聊天消息
     switch (typedMsg.type) {
       case "chat_msg":
-        console.log(typedMsg);
         // 将新消息添加到消息列表
+        // 会话中，另一个用户的id
         let peerId =
           typedMsg.data.sender_id === userInfo.loginInfo.id
             ? typedMsg.data.receiver_id
@@ -138,15 +141,19 @@ const startNewWebSocket = () => {
           receiver_id: typedMsg.data.receiver_id,
           content: typedMsg.data.content,
         });
+        console.log(peerId);
 
-        // // 滑动消息列表到最底部
-        // let msgList = msgListRef.value;
-        // // 等待DOM更新完毕
-        // await nextTick();
-        // msgList?.scrollTo({
-        //   top: msgList.scrollHeight,
-        //   behavior: "smooth",
-        // });
+        // 如果是用户自己发的消息，发送成功后，滑动消息列表到最底部
+        if (typedMsg.data.sender_id === userInfo.loginInfo.id) {
+          let msgList = msgListRef.value;
+          console.log(msgList);
+          // 等待DOM更新完毕
+          await nextTick();
+          msgList?.scrollTo({
+            top: msgList.scrollHeight,
+            behavior: "smooth",
+          });
+        }
         break;
       default:
         break;
