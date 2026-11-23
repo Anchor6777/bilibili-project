@@ -2,7 +2,7 @@
 import { onMounted, ref, type Ref } from "vue";
 import { useNavBarStore } from "../store/navBarStore";
 import { getVideoList } from "../api/video";
-import type { NamedVideo, PageRespnse } from "../model/TypeDefinition";
+import type { NamedVideo, PageResponse } from "../model/TypeDefinition";
 import { useRouter } from "vue-router";
 import { formatPlayCount, formatPlayTime } from "../constant";
 import dayjs from "dayjs";
@@ -53,7 +53,7 @@ const tagNames = [
 ];
 
 const loading = ref(false);
-const videoPageData: Ref<PageRespnse<NamedVideo> | null> = ref(null);
+const videoPageData: Ref<PageResponse<NamedVideo> | null> = ref(null);
 const recommend_videos: Ref<NamedVideo[]> = ref([]);
 const noMore = ref(false);
 
@@ -757,10 +757,7 @@ const onAuthorInfoClick = (userID: number) => {
             :x-gap="24"
             :y-gap="24"
           >
-            <n-gi
-              v-for="(item, _) in recommend_videos"
-              :key="item.video.id"
-            >
+            <n-gi v-for="(item, _) in recommend_videos" :key="item.video.id">
               <div class="intro-video-item">
                 <div style="position: relative">
                   <img
@@ -839,10 +836,7 @@ const onAuthorInfoClick = (userID: number) => {
       <div class="recommend-video-list">
         <n-infinite-scroll :distance="0" @load="handleLoad">
           <n-grid cols="4 xxl:5" responsive="screen" :x-gap="24" :y-gap="24">
-            <n-gi
-              v-for="(item, _) in recommend_videos"
-              :key="item.video.id"
-            >
+            <n-gi v-for="(item, _) in recommend_videos" :key="item.video.id">
               <div class="intro-video-item">
                 <div style="position: relative">
                   <img

@@ -103,10 +103,13 @@ const startNewWebSocket = () => {
     // 1."chat_msg"，普通聊天消息
     switch (typedMsg.type) {
       case "chat_msg":
+        console.log(typedMsg);
         // 将新消息添加到消息列表
-        let record: ChatRecord | undefined = chat_records_map.get(
-          typedMsg.data.receiver_id,
-        );
+        let peerId =
+          typedMsg.data.sender_id === userInfo.loginInfo.id
+            ? typedMsg.data.receiver_id
+            : typedMsg.sender_id;
+        let record: ChatRecord | undefined = chat_records_map.get(peerId);
         // 消息列表中不存在该用户，创建新的条目插入到数组头部
         if (!record) {
           const res = await getOneChatRecord(
@@ -130,7 +133,7 @@ const startNewWebSocket = () => {
         }
         // 存在该用户，直接插入到消息列表
         record!.msgList.push({
-          id: -1,
+          id: typedMsg.data.id,
           sender_id: typedMsg.data.sender_id,
           receiver_id: typedMsg.data.receiver_id,
           content: typedMsg.data.content,
