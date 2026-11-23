@@ -111,7 +111,7 @@ const startNewWebSocket = () => {
         let peerId =
           typedMsg.data.sender_id === userInfo.loginInfo.id
             ? typedMsg.data.receiver_id
-            : typedMsg.sender_id;
+            : typedMsg.data.sender_id;
         let record: ChatRecord | undefined = chat_records_map.get(peerId);
         // 消息列表中不存在该用户，创建新的条目插入到数组头部
         if (!record) {
