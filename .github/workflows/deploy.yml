@@ -1,0 +1,65 @@
+# action名
+name: Deploy Frontend         
+
+# 执行时机: 在push到master分支后执行
+on:                           
+  push:
+    branches: [master]
+  workflow_dispatch:          # 同时允许在 Actions 页面手动触发
+
+# 同一时间只跑一个部署，避免两次 push 打架
+concurrency:
+  group: deploy-frontend
+  # 后一个action需要等待前一个action执行完
+  cancel-in-progress: false
+
+# job作业。定义容器、步骤
+jobs:
+  # job名称
+  build-and-deploy:
+    # 容器/运行环境
+    runs-on: ubuntu-latest
+    # 超时时间
+    timeout-minutes: 15
+
+    # 步骤
+    steps:
+      # 把master分支代码发送到容器中
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 安装node依赖
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'   # Vite 8 要求 Node ≥ 20.19 / 22.12
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+  
+      # 配置ssh私钥
+      - name: Setup SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "${{ secrets.SSH_PORT || 22 }}" -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      # 将构建产物发送到服务器
+      - name: Deploy to server
+        run: |
+          rsync -az --delete --delay-updates \
+            -e "ssh -i ~/.ssh/id_ed25519 -p ${{ secrets.SSH_PORT || 22 }}" \
+            dist "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/bili/"
+
+      - name: Verify
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -p ${{ secrets.SSH_PORT || 22 }} \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            'curl -fsS -o /dev/null -w "HTTP %{http_code}\n" http://127.0.0.1/ && ls -l /var/www/bili/index.html'
