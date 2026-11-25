@@ -26,11 +26,11 @@ jobs:
     steps:
       # 把master分支代码发送到容器中
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # 安装node依赖
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '24.16.0'   # Vite 8 要求 Node ≥ 20.19 / 22.12
           cache: 'npm'
